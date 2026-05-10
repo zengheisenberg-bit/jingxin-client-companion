@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>境心客户陪伴系统 - 共享查看</title>
+  <style>
+    :root {
+      --sun-yellow: #F5C842;
+      --lemon: #FAE07A;
+      --cream: #FEFAE6;
+      --warm-wheat: #C8924A;
+      --deep-ink: #2C2720;
+      --paper-beige: #E8DCC8;
+      --umber: #5C4A28;
+      --white-paper: #FFFDF2;
+      --soft-line: rgba(92, 74, 40, 0.18);
+      --font-title: "Hannotate SC", "Kaiti SC", "STKaiti", "Songti SC", "PingFang SC", serif;
+      --font-ui: "PingFang SC", "Yuanti SC", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--deep-ink);
+      font-family: var(--font-ui);
+      background:
+        radial-gradient(circle at 16% 0%, rgba(250, 224, 122, 0.45), transparent 30%),
+        linear-gradient(135deg, rgba(255,255,255,.72) 0 25%, transparent 25% 50%, rgba(232,220,200,.16) 50% 75%, transparent 75%),
+        var(--cream);
+      background-size: auto, 18px 18px, auto;
+    }
+
+    .shell {
+      width: min(1280px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding: 28px;
+      border: 1px solid rgba(92,74,40,.12);
+      border-radius: 30px;
+      background: rgba(255,253,242,.74);
+      box-shadow: 0 18px 52px rgba(92,74,40,.07);
+    }
+
+    h1, h2 {
+      margin: 0;
+      font-family: var(--font-title);
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      max-width: 680px;
+      color: var(--umber);
+      line-height: 1.7;
+    }
+
+    .stamp {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--soft-line);
+      background: rgba(253,245,208,.62);
+      color: var(--umber);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(92,74,40,.12);
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(92,74,40,.12);
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 18px;
+      background: rgba(255,253,242,.76);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--umber);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 560;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid rgba(92,74,40,.10);
+      border-radius: 26px;
+      background: rgba(255,253,242,.76);
+      box-shadow: 0 18px 52px rgba(92,74,40,.07);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 18px 20px 10px;
+      border-bottom: 1px solid rgba(92,74,40,.10);
+    }
+
+    .panel h2 {
+      font-size: 26px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(92,74,40,.10);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--warm-wheat);
+      background: rgba(253,245,208,.42);
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .badge {
+      display: inline-flex;
+      margin: 0 5px 5px 0;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(245,200,66,.22);
+      color: var(--umber);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .activity {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(92,74,40,.10);
+    }
+
+    .activity:last-child { border-bottom: 0; }
+
+    .activity h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .activity p {
+      margin: 0 0 10px;
+      color: var(--umber);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .empty {
+      padding: 36px;
+      color: var(--umber);
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .hero, .grid {
+        grid-template-columns: 1fr;
+      }
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stamp {
+        width: fit-content;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <h1>境心客户陪伴系统</h1>
+        <p class="subtitle">共享查看页为只读版本，用于让管理员和推荐人快速看见客户、活动、报名签到与陪伴进展。</p>
+      </div>
+      <div class="stamp" id="exportedAt">共享数据</div>
+    </section>
+
+    <section class="metrics" aria-label="概览">
+      <div class="metric"><span>客户档案</span><strong id="clientCount">0</strong></div>
+      <div class="metric"><span>活动数量</span><strong id="activityCount">0</strong></div>
+      <div class="metric"><span>报名人数</span><strong id="rosterCount">0</strong></div>
+      <div class="metric"><span>已签到</span><strong id="checkinCount">0</strong></div>
+    </section>
+
+    <section class="grid">
+      <section class="panel">
+        <div class="panel-head"><h2>客户对应情况</h2></div>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>客户</th>
+                <th>推荐人</th>
+                <th>分类 / 阶段</th>
+                <th>课程信息</th>
+                <th>关键信息</th>
+              </tr>
+            </thead>
+            <tbody id="clientRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="panel-head"><h2>活动报名 / 签到</h2></div>
+        <div id="activityList"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const state = readShareState();
+    render();
+
+    function readShareState() {
+      try {
+        const hash = new URLSearchParams(location.hash.slice(1));
+        const encoded = hash.get("data");
+        if (!encoded) throw new Error("No share data");
+        const normalized = encoded.replaceAll("-", "+").replaceAll("_", "/");
+        const padded = normalized + "=".repeat((4 - normalized.length % 4) % 4);
+        const binary = atob(padded);
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        return JSON.parse(new TextDecoder().decode(bytes));
+      } catch {
+        return { clients: [], activities: [], followUps: [], users: [], exportedAt: "" };
+      }
+    }
+
+    function render() {
+      const clients = state.clients || [];
+      const activities = state.activities || [];
+      const rosters = activities.flatMap((activity) => activity.roster || []);
+      document.getElementById("clientCount").textContent = clients.length;
+      document.getElementById("activityCount").textContent = activities.length;
+      document.getElementById("rosterCount").textContent = rosters.length;
+      document.getElementById("checkinCount").textContent = rosters.filter((row) => row.checkedIn).length;
+      document.getElementById("exportedAt").textContent = state.exportedAt ? `生成于 ${new Date(state.exportedAt).toLocaleString("zh-CN")}` : "共享查看";
+      renderClients(clients);
+      renderActivities(activities, clients);
+    }
+
+    function renderClients(clients) {
+      const body = document.getElementById("clientRows");
+      if (!clients.length) {
+        body.innerHTML = `<tr><td colspan="5" class="empty">这个共享链接里没有客户数据。</td></tr>`;
+        return;
+      }
+      body.innerHTML = clients.map((client) => `
+        <tr>
+          <td><strong>${escapeHtml(client.name)}</strong><br>${escapeHtml(client.phone || "")} ${escapeHtml(client.wechat || "")}</td>
+          <td>${escapeHtml(client.referrerName || client.ownerName || "")}</td>
+          <td><span class="badge">${escapeHtml(client.category || "")}</span><span class="badge">${escapeHtml(client.stage || "")}</span></td>
+          <td>${escapeHtml(client.enrolledCourses || "未填写")}<br>${escapeHtml(client.attendedCourses || "")}</td>
+          <td>${escapeHtml(client.needs || "")}<br>${escapeHtml(client.situation || "")}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderActivities(activities, clients) {
+      const list = document.getElementById("activityList");
+      if (!activities.length) {
+        list.innerHTML = `<div class="empty">这个共享链接里没有活动数据。</div>`;
+        return;
+      }
+      list.innerHTML = activities.map((activity) => {
+        const roster = activity.roster || [];
+        const rows = roster.length ? roster.map((row) => {
+          const client = clients.find((item) => item.id === row.clientId);
+          return `<div style="margin-top:8px;">
+            <span class="badge">${escapeHtml(row.checkedIn ? "已到" : "未到")}</span>
+            <strong>${escapeHtml(row.rawName || client?.name || "")}</strong>
+            ${client ? `<br><span style="color:var(--umber);font-size:12px;">${escapeHtml(client.referrerName || client.ownerName || "")} · ${escapeHtml(client.category || "")} · ${escapeHtml(client.stage || "")}</span>` : `<br><span style="color:var(--umber);font-size:12px;">未匹配客户档案</span>`}
+          </div>`;
+        }).join("") : `<p>还没有报名名单。</p>`;
+        return `<article class="activity">
+          <h3>${escapeHtml(activity.title || "未命名活动")}</h3>
+          <p>${escapeHtml(activity.date || "")} · ${escapeHtml(activity.type || "")}</p>
+          ${rows}
+        </article>`;
+      }).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,2317 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>境心客户陪伴系统</title>
+  <style>
+    :root {
+      --sun-yellow: #F5C842;
+      --lemon: #FAE07A;
+      --cream: #FEFAE6;
+      --warm-wheat: #C8924A;
+      --deep-ink: #2C2720;
+      --deep-sun: #E8B420;
+      --pale-cream: #FDF5D0;
+      --paper-beige: #E8DCC8;
+      --umber: #5C4A28;
+      --white-paper: #FFFDF2;
+      --soft-line: rgba(92, 74, 40, 0.18);
+      --shadow-soft: 0 28px 70px rgba(92, 74, 40, 0.09);
+      --shadow-tight: 0 10px 30px rgba(92, 74, 40, 0.10);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --font-title: "Hannotate SC", "Kaiti SC", "STKaiti", "Songti SC", "PingFang SC", serif;
+      --font-ui: "PingFang SC", "Yuanti SC", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--deep-ink);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(250, 224, 122, 0.45), transparent 28%),
+        radial-gradient(circle at 82% 2%, rgba(245, 200, 66, 0.24), transparent 22%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0 25%, transparent 25% 50%, rgba(232, 220, 200, 0.18) 50% 75%, transparent 75%),
+        var(--cream);
+      background-size: auto, auto, 18px 18px, auto;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-shell {
+      width: min(1380px, calc(100% - 44px));
+      margin: 0 auto;
+      padding: 18px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      padding: 8px 0 18px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-title);
+      font-size: clamp(34px, 4.1vw, 58px);
+      line-height: 1;
+      font-weight: 650;
+      letter-spacing: 0;
+      color: #2F281C;
+      text-shadow: 0 1px 0 rgba(255, 253, 242, 0.8);
+    }
+
+    .brand p {
+      margin: 10px 0 0;
+      max-width: 560px;
+      color: var(--umber);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 610px;
+      padding: 9px;
+      border: 1px solid rgba(92, 74, 40, 0.12);
+      border-radius: 28px;
+      background: rgba(255, 253, 242, 0.58);
+      box-shadow: 0 14px 38px rgba(92, 74, 40, 0.06);
+    }
+
+    .field-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px 8px 14px;
+      border: 1px solid var(--soft-line);
+      border-radius: 999px;
+      background: rgba(255, 253, 242, 0.72);
+      backdrop-filter: blur(8px);
+      color: var(--umber);
+      font-size: 12px;
+    }
+
+    .field-inline select {
+      min-width: 108px;
+      border: 0;
+      background: transparent;
+      outline: 0;
+      color: var(--deep-ink);
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 9px 14px;
+      background: rgba(255, 253, 242, 0.76);
+      color: var(--deep-ink);
+      line-height: 1;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-tight);
+    }
+
+    .btn.primary {
+      background: var(--sun-yellow);
+      border-color: var(--deep-sun);
+      color: var(--deep-ink);
+      font-weight: 600;
+    }
+
+    .btn.ghost {
+      border-color: var(--soft-line);
+    }
+
+    .btn.text {
+      padding: 8px 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      color: var(--warm-wheat);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 315px);
+      gap: clamp(16px, 2.4vw, 34px);
+      align-items: center;
+      padding: 18px 22px;
+      border: 1px solid rgba(92, 74, 40, 0.12);
+      border-radius: 30px;
+      background:
+        linear-gradient(120deg, rgba(255, 253, 242, 0.82), rgba(253, 245, 208, 0.52)),
+        linear-gradient(90deg, rgba(245, 200, 66, 0.16), transparent 42%);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-title {
+      margin: 0;
+      max-width: none;
+      font-family: var(--font-title);
+      font-size: clamp(30px, 3.6vw, 48px);
+      line-height: 1.12;
+      font-weight: 650;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .hero-line {
+      display: inline;
+    }
+
+    .hero-note {
+      position: relative;
+      min-height: 126px;
+      padding: 17px 18px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 242, 0.95), rgba(253, 245, 208, 0.78)),
+        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(92, 74, 40, 0.055) 28px);
+      box-shadow: 0 18px 48px rgba(92, 74, 40, 0.08);
+      overflow: hidden;
+    }
+
+    .hero-note::after {
+      content: "";
+      position: absolute;
+      width: 94px;
+      height: 94px;
+      right: -30px;
+      top: -28px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 200, 66, 0.64), rgba(245, 200, 66, 0.08) 62%, transparent 64%);
+    }
+
+    .note-label {
+      color: var(--warm-wheat);
+      font-size: 12px;
+    }
+
+    .note-number {
+      display: block;
+      margin-top: 10px;
+      font-size: 40px;
+      line-height: 0.9;
+      font-weight: 500;
+    }
+
+    .note-copy {
+      max-width: 270px;
+      margin: 9px 0 0;
+      color: var(--umber);
+      font-size: 13px;
+      line-height: 1.62;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin: 14px 0 22px;
+      background: rgba(92, 74, 40, 0.12);
+      border: 1px solid rgba(92, 74, 40, 0.12);
+      border-radius: 26px;
+      overflow: hidden;
+    }
+
+    .metric {
+      min-height: 82px;
+      padding: 16px 18px;
+      background: rgba(255, 253, 242, 0.78);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--umber);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 9px;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 480;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.82fr) minmax(430px, 1.34fr) minmax(300px, 0.9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid rgba(92, 74, 40, 0.10);
+      border-radius: 26px;
+      background: rgba(255, 253, 242, 0.76);
+      box-shadow: 0 18px 52px rgba(92, 74, 40, 0.07);
+      overflow: hidden;
+    }
+
+    .panel.open {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px 10px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 560;
+    }
+
+    .filters {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 12px;
+    }
+
+    .search,
+    .select,
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 253, 242, 0.78);
+      outline: 0;
+      padding: 10px 12px;
+    }
+
+    .textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .client-list {
+      display: grid;
+      gap: 2px;
+      max-height: min(720px, calc(100vh - 330px));
+      overflow: auto;
+      padding: 0 10px 12px;
+    }
+
+    .client-item {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 13px 12px;
+      background: transparent;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .client-item:hover,
+    .client-item.active {
+      background: rgba(250, 224, 122, 0.28);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--pale-cream);
+      color: var(--warm-wheat);
+      font-weight: 620;
+      box-shadow: inset 0 0 0 1px rgba(92, 74, 40, 0.08);
+    }
+
+    .client-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .client-meta {
+      margin-top: 5px;
+      color: rgba(44, 39, 32, 0.63);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .score {
+      min-width: 42px;
+      text-align: right;
+      color: var(--warm-wheat);
+    }
+
+    .score strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 520;
+    }
+
+    .score small {
+      color: rgba(44, 39, 32, 0.5);
+      font-size: 10px;
+    }
+
+    .detail {
+      padding: 22px;
+      background: rgba(255, 253, 242, 0.70);
+      border: 1px solid rgba(92, 74, 40, 0.10);
+      border-radius: 26px;
+      box-shadow: 0 18px 52px rgba(92, 74, 40, 0.07);
+    }
+
+    .detail-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .identity {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .avatar.big {
+      width: 68px;
+      height: 68px;
+      font-size: 26px;
+      background: linear-gradient(135deg, var(--pale-cream), rgba(245, 200, 66, 0.38));
+    }
+
+    .identity h2 {
+      margin: 0;
+      font-size: clamp(26px, 2.8vw, 40px);
+      line-height: 1.05;
+      font-weight: 560;
+    }
+
+    .identity p {
+      margin: 10px 0 0;
+      color: var(--umber);
+      line-height: 1.62;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: rgba(245, 200, 66, 0.20);
+      color: var(--umber);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .badge.line {
+      background: transparent;
+      border: 1px solid var(--soft-line);
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .section {
+      padding: 15px 0;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--warm-wheat);
+      font-weight: 620;
+    }
+
+    .section p {
+      margin: 0;
+      color: rgba(44, 39, 32, 0.78);
+      line-height: 1.72;
+    }
+
+    .course-meter {
+      margin-top: 18px;
+    }
+
+    .meter-line {
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(232, 220, 200, 0.72);
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--sun-yellow), var(--warm-wheat));
+      transition: width 220ms ease;
+    }
+
+    .timeline {
+      padding: 0 18px 18px;
+      max-height: min(760px, calc(100vh - 330px));
+      overflow: auto;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0 0 20px 20px;
+      border-left: 1px solid var(--paper-beige);
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 0;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--sun-yellow);
+      box-shadow: 0 0 0 5px rgba(245, 200, 66, 0.18);
+    }
+
+    .timeline-date {
+      color: rgba(44, 39, 32, 0.5);
+      font-size: 11px;
+    }
+
+    .timeline-title {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 7px;
+      font-weight: 610;
+    }
+
+    .timeline-copy {
+      margin-top: 8px;
+      color: rgba(44, 39, 32, 0.72);
+      font-size: 12px;
+      line-height: 1.75;
+    }
+
+    .funnel {
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid rgba(92, 74, 40, 0.10);
+      border-radius: 26px;
+      background: rgba(255, 253, 242, 0.72);
+      box-shadow: 0 18px 52px rgba(92, 74, 40, 0.07);
+    }
+
+    .funnel h2 {
+      margin: 0;
+      font-size: clamp(24px, 2.8vw, 36px);
+      line-height: 1;
+      font-weight: 440;
+    }
+
+    .funnel p {
+      margin: 10px 0 28px;
+      color: var(--umber);
+    }
+
+    .funnel-bars {
+      display: grid;
+      gap: 14px;
+    }
+
+    .funnel-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 70px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .bar-track {
+      height: 42px;
+      border-radius: 999px;
+      background: rgba(232, 220, 200, 0.44);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 36px;
+      border-radius: inherit;
+      background: var(--sun-yellow);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 14px;
+      color: var(--deep-ink);
+      font-size: 13px;
+      transition: width 220ms ease;
+    }
+
+    .roster-panel {
+      margin-top: 18px;
+      padding-bottom: 18px;
+    }
+
+    .roster-tools {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr) auto auto auto;
+      gap: 10px;
+      align-items: start;
+      padding: 0 18px 14px;
+    }
+
+    .roster-textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .roster-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 18px 12px;
+      color: var(--umber);
+      font-size: 12px;
+    }
+
+    .roster-table-wrap {
+      margin: 0 18px;
+      border: 1px solid rgba(92, 74, 40, 0.12);
+      border-radius: 18px;
+      overflow: auto;
+      background: rgba(255, 253, 242, 0.58);
+    }
+
+    .roster-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .roster-table th,
+    .roster-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(92, 74, 40, 0.10);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .roster-table th {
+      color: var(--warm-wheat);
+      font-weight: 620;
+      background: rgba(253, 245, 208, 0.45);
+      white-space: nowrap;
+    }
+
+    .roster-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .roster-match-select {
+      min-width: 150px;
+      border: 1px solid var(--soft-line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255, 253, 242, 0.82);
+      outline: 0;
+    }
+
+    .roster-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--umber);
+      font-size: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(44, 39, 32, 0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(780px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      border-radius: 30px;
+      background: var(--white-paper);
+      box-shadow: 0 40px 120px rgba(44, 39, 32, 0.24);
+      padding: 28px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 470;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .empty {
+      padding: 44px 22px;
+      color: var(--umber);
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 40;
+      display: none;
+      max-width: 360px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: var(--deep-ink);
+      color: var(--cream);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (min-width: 1181px) {
+      .app-shell {
+        display: grid;
+        grid-template-columns: 292px minmax(0, 1fr);
+        grid-template-areas:
+          "side hero"
+          "side metrics"
+          "workspace workspace"
+          "roster roster";
+        gap: 14px 18px;
+        width: min(1320px, calc(100% - 48px));
+        padding-top: 18px;
+      }
+
+      .topbar {
+        grid-area: side;
+        align-self: start;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 22px;
+        min-height: 318px;
+        padding: 24px;
+        border: 1px solid rgba(92, 74, 40, 0.12);
+        border-radius: 30px;
+        background:
+          linear-gradient(150deg, rgba(255, 253, 242, 0.88), rgba(253, 245, 208, 0.48)),
+          repeating-linear-gradient(0deg, transparent, transparent 26px, rgba(92, 74, 40, 0.045) 27px);
+        box-shadow: 0 18px 52px rgba(92, 74, 40, 0.07);
+      }
+
+      .brand h1 {
+        font-size: 50px;
+        white-space: nowrap;
+      }
+
+      .brand p {
+        max-width: 230px;
+        font-size: 13px;
+        line-height: 1.72;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-content: stretch;
+        align-items: stretch;
+        max-width: none;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .field-inline {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        width: 100%;
+        padding: 11px 13px;
+        border-radius: 18px;
+        background: rgba(255, 253, 242, 0.70);
+      }
+
+      .field-inline select {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .toolbar .btn {
+        width: 100%;
+        border-radius: 18px;
+        padding: 11px 13px;
+        text-align: left;
+      }
+
+      .hero {
+        grid-area: hero;
+        min-height: 166px;
+      }
+
+      .hero-title {
+        font-size: clamp(34px, 3.25vw, 46px);
+      }
+
+      .metrics {
+        grid-area: metrics;
+        margin: 0;
+      }
+
+      .workspace {
+        grid-area: workspace;
+        grid-template-columns: 330px minmax(0, 1fr) 360px;
+      }
+
+      .roster-panel {
+        grid-area: roster;
+      }
+
+      .client-list,
+      .timeline {
+        max-height: min(650px, calc(100vh - 390px));
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 340px 1fr;
+      }
+
+      .workspace > aside:last-child {
+        grid-column: 1 / -1;
+      }
+
+      .timeline {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .app-shell {
+        width: min(100% - 28px, 720px);
+        padding-top: 18px;
+      }
+
+      .topbar,
+      .hero,
+      .workspace,
+      .story-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+        gap: 18px;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+        width: 100%;
+        max-width: none;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .hero-title {
+        white-space: normal;
+      }
+
+      .workspace {
+        display: grid;
+      }
+
+      .detail-top {
+        display: grid;
+      }
+
+      .detail-actions {
+        justify-content: flex-start;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .funnel-row {
+        grid-template-columns: 82px 1fr 48px;
+      }
+
+      .roster-tools {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .app-shell {
+        width: calc(100vw - 28px);
+        max-width: none;
+        overflow: hidden;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        max-width: none;
+      }
+
+      .field-inline {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        grid-column: 1 / -1;
+        justify-content: stretch;
+        width: 100%;
+      }
+
+      .field-inline select {
+        min-width: 0;
+        width: 100%;
+        max-width: none;
+        text-align: left;
+      }
+
+      .toolbar .btn {
+        min-width: 0;
+        width: 100%;
+        padding-inline: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .brand h1 {
+        font-size: 48px;
+      }
+
+      .hero-title {
+        max-width: 100%;
+        font-size: 36px;
+        line-height: 1.12;
+      }
+
+      .hero-line {
+        display: block;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric {
+        min-height: 92px;
+        padding: 16px;
+      }
+
+      .metric strong {
+        font-size: 32px;
+      }
+
+      .hero-note,
+      .detail,
+      .funnel,
+      .modal {
+        padding: 22px;
+      }
+
+      .client-item {
+        grid-template-columns: 40px 1fr;
+      }
+
+      .score {
+        grid-column: 2;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>境心客户陪伴系统</h1>
+        <p>用心陪伴，看见改变。这里记录每一次靠近、每一次觉察，以及一段关系慢慢长出的方向。</p>
+      </div>
+      <div class="toolbar" aria-label="工具栏">
+        <label class="field-inline">当前使用者
+          <select id="currentUserSelect"></select>
+        </label>
+        <button class="btn ghost" id="addUserBtn" type="button">新增使用者</button>
+        <button class="btn ghost" id="exportBtn" type="button">导出备份</button>
+        <button class="btn ghost" id="shareViewBtn" type="button">共享查看</button>
+        <button class="btn ghost" id="shareBaseBtn" type="button">线上地址</button>
+        <button class="btn ghost" id="importBtn" type="button">导入备份</button>
+        <button class="btn ghost" id="resetBtn" type="button">恢复示例</button>
+        <input class="file-input" id="importFile" type="file" accept="application/json,.json" />
+      </div>
+    </header>
+
+    <section class="hero" aria-labelledby="heroTitle">
+      <h2 class="hero-title" id="heroTitle"><span class="hero-line">今天，</span><span class="hero-line">和谁好好聊一聊？</span></h2>
+      <div class="hero-note">
+        <span class="note-label">今日需要被看见</span>
+        <strong class="note-number" id="todayReminderHero">0</strong>
+        <p class="note-copy">提醒不是催促，而是给一段关系留出温柔的位置。</p>
+      </div>
+    </section>
+
+    <section class="metrics" aria-label="工作台统计">
+      <div class="metric"><span>客户档案</span><strong id="metricClients">0</strong></div>
+      <div class="metric"><span>重点陪伴</span><strong id="metricPriority">0</strong></div>
+      <div class="metric"><span>本月活动参与</span><strong id="metricActivities">0</strong></div>
+      <div class="metric"><span>平均活跃度</span><strong id="metricAvgScore">0</strong></div>
+    </section>
+
+    <main class="workspace">
+      <aside class="panel" aria-label="客户列表">
+        <div class="panel-head">
+          <h2 class="panel-title">陪伴名单</h2>
+          <button class="btn primary" id="newClientBtn" type="button">新增客户</button>
+        </div>
+        <div class="filters">
+          <input class="search" id="searchInput" type="search" placeholder="搜索姓名、微信、课程、状态" />
+          <div class="filter-row">
+            <select class="select" id="stageFilter">
+              <option value="all">全部阶段</option>
+              <option value="潜在客户">潜在客户</option>
+              <option value="体验">体验</option>
+              <option value="成交">成交</option>
+              <option value="复购">复购</option>
+            </select>
+            <select class="select" id="categoryFilter">
+              <option value="all">全部分类</option>
+              <option value="正式课程学员">正式课程学员</option>
+              <option value="公益课学员">公益课学员</option>
+              <option value="新老朋友">新老朋友</option>
+            </select>
+          </div>
+        </div>
+        <div class="client-list" id="clientList"></div>
+      </aside>
+
+      <section class="panel open" aria-label="客户详情">
+        <div class="detail" id="clientDetail"></div>
+      </section>
+
+      <aside class="panel" aria-label="时间线">
+        <div class="panel-head">
+          <h2 class="panel-title">陪伴时间线</h2>
+          <div>
+            <button class="btn ghost" id="newFollowBtn" type="button">记录陪伴</button>
+            <button class="btn ghost" id="newActivityBtn" type="button">记录活动</button>
+          </div>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <section class="funnel" aria-labelledby="funnelTitle">
+          <h2 id="funnelTitle">关系阶段</h2>
+          <p>从初识、体验、确认，到长期陪伴，看到关系如何一步步变深。</p>
+          <div class="funnel-bars" id="funnelBars"></div>
+        </section>
+      </aside>
+    </main>
+
+    <section class="panel roster-panel" aria-label="活动报名与签到名单">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">活动报名与签到名单</h2>
+          <p style="margin:6px 0 0;color:var(--umber);font-size:12px;line-height:1.6;">录入报名姓名后会自动匹配客户档案，也可以手动选择对应客户后导出名单。</p>
+        </div>
+        <button class="btn primary" id="newRosterActivityBtn" type="button">新建活动</button>
+      </div>
+      <div class="roster-tools">
+        <select class="select" id="rosterActivitySelect" aria-label="选择活动"></select>
+        <textarea class="textarea roster-textarea" id="rosterNameInput" placeholder="批量录入报名姓名：每行一个姓名，也可用顿号、逗号分隔"></textarea>
+        <button class="btn ghost" id="importRosterBtn" type="button">录入报名</button>
+        <button class="btn ghost" id="exportRosterBtn" type="button">下载名单</button>
+        <button class="btn ghost" id="clearRosterInputBtn" type="button">清空输入</button>
+      </div>
+      <div class="roster-summary" id="rosterSummary"></div>
+      <div class="roster-table-wrap">
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th>报名姓名</th>
+              <th>匹配客户</th>
+              <th>推荐人</th>
+              <th>分类 / 阶段</th>
+              <th>电话 / 微信</th>
+              <th>课程信息</th>
+              <th>客户关键信息</th>
+              <th>签到</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">编辑</h2>
+        <button class="btn text" id="closeModalBtn" type="button">关闭</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const STORAGE_KEY = "my-home-local-v1";
+    const today = () => new Date().toISOString().slice(0, 10);
+    const uid = (prefix) => prefix + Math.random().toString(36).slice(2, 10);
+
+    const seedState = {
+      users: [
+        { id: "u1", name: "林老师" },
+        { id: "u2", name: "许老师" }
+      ],
+      currentUserId: "u1",
+      selectedClientId: "c1",
+      clients: [
+        {
+          id: "c1",
+          ownerName: "林老师",
+          name: "周女士",
+          age: 38,
+          phone: "13800008888",
+          wechat: "zhou-home",
+          occupation: "品牌主理人",
+          marriage: "已婚，一孩",
+          referrerName: "林老师",
+          category: "正式课程学员",
+          stage: "体验",
+          enrolledCourses: "身心调理基础课、情绪根源咨询",
+          attendedCourses: "身体觉察课、睡眠修复课",
+          courseRecognition: 82,
+          needs: "希望改善睡眠和长期紧绷感，也想重新找到工作与生活之间的边界。",
+          situation: "近期工作压力较大，表达里常出现疲惫和自责，肩颈紧张明显。",
+          tags: ["睡眠浅", "压力大", "肩颈紧张"],
+          createdAt: "2026-05-02"
+        },
+        {
+          id: "c2",
+          ownerName: "林老师",
+          name: "陈先生",
+          age: 45,
+          phone: "13900006666",
+          wechat: "chen-light",
+          occupation: "企业合伙人",
+          marriage: "已婚，二孩",
+          referrerName: "林老师",
+          category: "新老朋友",
+          stage: "潜在客户",
+          enrolledCourses: "",
+          attendedCourses: "春日身心觉察沙龙",
+          courseRecognition: 58,
+          needs: "想了解情绪和身体反应之间的关系，对长期胃部不适比较在意。",
+          situation: "习惯理性分析，暂时还不太愿意深入表达感受。",
+          tags: ["胃部紧", "理性", "初次接触"],
+          createdAt: "2026-05-04"
+        },
+        {
+          id: "c3",
+          ownerName: "林老师",
+          name: "顾女士",
+          age: 41,
+          phone: "13700009999",
+          wechat: "gu-sun",
+          occupation: "自由策展人",
+          marriage: "未婚",
+          referrerName: "许老师",
+          category: "公益课学员",
+          stage: "成交",
+          enrolledCourses: "一对一身心调理咨询",
+          attendedCourses: "公益静心课、身体觉察课",
+          courseRecognition: 91,
+          needs: "希望从情绪根源处理亲密关系里的反复失望。",
+          situation: "表达细腻，愿意持续练习，但遇到关系议题时容易焦虑。",
+          tags: ["关系议题", "焦虑", "表达细腻"],
+          createdAt: "2026-04-28"
+        },
+        {
+          id: "c4",
+          ownerName: "许老师",
+          name: "梁女士",
+          age: 36,
+          phone: "13600001234",
+          wechat: "liang-breath",
+          occupation: "瑜伽老师",
+          marriage: "已婚",
+          referrerName: "许老师",
+          category: "正式课程学员",
+          stage: "复购",
+          enrolledCourses: "年度身心陪伴计划",
+          attendedCourses: "调理咨询、主题沙龙、身体觉察课",
+          courseRecognition: 96,
+          needs: "希望把自己的身心体验转化成更稳定的教学状态。",
+          situation: "状态整体稳定，最近在探索职业边界和自我滋养。",
+          tags: ["稳定", "复购", "职业边界"],
+          createdAt: "2026-03-20"
+        }
+      ],
+      activities: [
+        {
+          id: "a1",
+          title: "春日身心觉察沙龙",
+          date: "2026-05-09",
+          type: "主题沙龙",
+          participantClientIds: ["c1", "c2"],
+          feedback: "现场互动积极，身体觉察练习后有明显放松。",
+          attended: true
+        },
+        {
+          id: "a2",
+          title: "公益静心课",
+          date: "2026-05-06",
+          type: "公益课",
+          participantClientIds: ["c3"],
+          feedback: "对呼吸练习有共鸣，课后主动询问咨询安排。",
+          attended: true
+        },
+        {
+          id: "a3",
+          title: "周末丰盈人生小课",
+          date: "2026-05-18",
+          type: "课程",
+          participantClientIds: ["c4"],
+          feedback: "计划参加，适合作为复购后的持续支持。",
+          attended: false
+        }
+      ],
+      followUps: [
+        {
+          id: "f1",
+          clientId: "c1",
+          date: "2026-05-10",
+          emotion: "焦虑",
+          content: "聊到近期睡眠问题，她意识到压力来自长期自我要求。",
+          nextAction: "三天后提醒她记录睡前身体感受。",
+          remindDate: "2026-05-13",
+          done: false
+        },
+        {
+          id: "f2",
+          clientId: "c2",
+          date: "2026-05-08",
+          emotion: "好奇",
+          content: "沙龙后简单沟通，他对身体症状背后的情绪原因感兴趣。",
+          nextAction: "发送课程介绍，邀请做一次初步咨询。",
+          remindDate: "2026-05-11",
+          done: false
+        },
+        {
+          id: "f3",
+          clientId: "c3",
+          date: "2026-05-07",
+          emotion: "感恩",
+          content: "反馈咨询后睡眠有改善，但亲密关系议题仍有波动。",
+          nextAction: "下次咨询前请她记录一次触发点。",
+          remindDate: "2026-05-14",
+          done: false
+        }
+      ]
+    };
+
+    let state = loadState();
+    const els = {};
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      cacheElements();
+      bindEvents();
+      ensureValidSelection();
+      render();
+    }
+
+    function cacheElements() {
+      [
+        "currentUserSelect", "addUserBtn", "exportBtn", "shareViewBtn", "shareBaseBtn", "importBtn", "resetBtn", "importFile",
+        "todayReminderHero", "metricClients", "metricPriority", "metricActivities", "metricAvgScore",
+        "newClientBtn", "searchInput", "stageFilter", "categoryFilter", "clientList", "clientDetail",
+        "funnelBars", "newFollowBtn", "newActivityBtn", "timeline", "modalBackdrop", "modalTitle",
+        "closeModalBtn", "modalBody", "toast", "rosterActivitySelect", "rosterNameInput",
+        "importRosterBtn", "exportRosterBtn", "clearRosterInputBtn", "newRosterActivityBtn",
+        "rosterSummary", "rosterTableBody"
+      ].forEach((id) => els[id] = document.getElementById(id));
+    }
+
+    function bindEvents() {
+      els.currentUserSelect.addEventListener("change", (event) => {
+        state.currentUserId = event.target.value;
+        state.selectedClientId = null;
+        ensureValidSelection();
+        saveAndRender();
+      });
+      els.addUserBtn.addEventListener("click", openUserModal);
+      els.exportBtn.addEventListener("click", exportBackup);
+      els.shareViewBtn.addEventListener("click", createShareView);
+      els.shareBaseBtn.addEventListener("click", openShareBaseModal);
+      els.importBtn.addEventListener("click", () => els.importFile.click());
+      els.importFile.addEventListener("change", importBackup);
+      els.resetBtn.addEventListener("click", resetSeed);
+      els.newClientBtn.addEventListener("click", () => openClientModal());
+      els.newFollowBtn.addEventListener("click", () => openFollowModal());
+      els.newActivityBtn.addEventListener("click", () => openActivityModal());
+      els.newRosterActivityBtn.addEventListener("click", () => openActivityModal());
+      els.rosterActivitySelect.addEventListener("change", (event) => {
+        state.selectedActivityId = event.target.value;
+        saveAndRender();
+      });
+      els.importRosterBtn.addEventListener("click", importRosterNames);
+      els.exportRosterBtn.addEventListener("click", exportRoster);
+      els.clearRosterInputBtn.addEventListener("click", () => {
+        els.rosterNameInput.value = "";
+      });
+      els.searchInput.addEventListener("input", render);
+      els.stageFilter.addEventListener("change", render);
+      els.categoryFilter.addEventListener("change", render);
+      els.closeModalBtn.addEventListener("click", closeModal);
+      els.modalBackdrop.addEventListener("click", (event) => {
+        if (event.target === els.modalBackdrop) closeModal();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeModal();
+      });
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return normalizeState(structuredClone(seedState));
+        const parsed = JSON.parse(raw);
+        return normalizeState({ ...structuredClone(seedState), ...parsed });
+      } catch {
+        return normalizeState(structuredClone(seedState));
+      }
+    }
+
+    function normalizeState(nextState) {
+      nextState.users ||= structuredClone(seedState.users);
+      nextState.clients ||= [];
+      nextState.activities ||= [];
+      nextState.followUps ||= [];
+      nextState.currentUserId ||= nextState.users[0]?.id;
+      nextState.activities = nextState.activities.map((activity) => ensureActivityRoster(activity, nextState.clients));
+      nextState.selectedActivityId ||= nextState.activities[0]?.id || "";
+      return nextState;
+    }
+
+    function ensureActivityRoster(activity, allClients = state.clients) {
+      const existing = Array.isArray(activity.roster) ? activity.roster : [];
+      const roster = existing.map((row) => ({
+        id: row.id || uid("r"),
+        rawName: row.rawName || allClients.find((client) => client.id === row.clientId)?.name || "",
+        clientId: row.clientId || "",
+        checkedIn: Boolean(row.checkedIn)
+      }));
+      (activity.participantClientIds || []).forEach((clientId) => {
+        if (!roster.some((row) => row.clientId === clientId)) {
+          const client = allClients.find((item) => item.id === clientId);
+          roster.push({
+            id: uid("r"),
+            rawName: client?.name || "",
+            clientId,
+            checkedIn: Boolean(activity.attended)
+          });
+        }
+      });
+      return { ...activity, roster };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function saveAndRender() {
+      saveState();
+      render();
+    }
+
+    function currentUser() {
+      return state.users.find((user) => user.id === state.currentUserId) || state.users[0];
+    }
+
+    function visibleClients() {
+      const user = currentUser();
+      const query = (els.searchInput?.value || "").trim().toLowerCase();
+      const stage = els.stageFilter?.value || "all";
+      const category = els.categoryFilter?.value || "all";
+      return state.clients
+        .filter((client) => client.ownerName === user.name || client.referrerName === user.name)
+        .filter((client) => stage === "all" || client.stage === stage)
+        .filter((client) => category === "all" || client.category === category)
+        .filter((client) => {
+          if (!query) return true;
+          return [
+            client.name, client.phone, client.wechat, client.occupation, client.referrerName,
+            client.category, client.stage, client.enrolledCourses, client.attendedCourses,
+            client.needs, client.situation, ...(client.tags || [])
+          ].join(" ").toLowerCase().includes(query);
+        })
+        .sort((a, b) => priorityScore(b) - priorityScore(a) || activityScore(b) - activityScore(a));
+    }
+
+    function ensureValidSelection() {
+      const clients = visibleClients();
+      if (!clients.some((client) => client.id === state.selectedClientId)) {
+        state.selectedClientId = clients[0]?.id || null;
+      }
+    }
+
+    function selectedClient() {
+      return state.clients.find((client) => client.id === state.selectedClientId) || null;
+    }
+
+    function render() {
+      ensureValidSelection();
+      renderUsers();
+      renderMetrics();
+      renderClientList();
+      renderDetail();
+      renderTimeline();
+      renderFunnel();
+      renderRoster();
+    }
+
+    function renderUsers() {
+      els.currentUserSelect.innerHTML = state.users
+        .map((user) => `<option value="${escapeHtml(user.id)}"${user.id === state.currentUserId ? " selected" : ""}>${escapeHtml(user.name)}</option>`)
+        .join("");
+    }
+
+    function renderMetrics() {
+      const clients = visibleClients();
+      const reminders = state.followUps.filter((follow) => {
+        const client = state.clients.find((item) => item.id === follow.clientId);
+        return client && clients.includes(client) && !follow.done && follow.remindDate && follow.remindDate <= today();
+      });
+      const priority = clients.filter((client) => isPriorityClient(client));
+      const month = today().slice(0, 7);
+      const activityCount = state.activities.filter((activity) => {
+        if (!activity.date.startsWith(month)) return false;
+        return activity.participantClientIds.some((id) => clients.some((client) => client.id === id));
+      }).reduce((sum, activity) => {
+        return sum + activity.participantClientIds.filter((id) => clients.some((client) => client.id === id)).length;
+      }, 0);
+      const avg = clients.length ? Math.round(clients.reduce((sum, client) => sum + activityScore(client), 0) / clients.length) : 0;
+
+      els.todayReminderHero.textContent = reminders.length;
+      els.metricClients.textContent = clients.length;
+      els.metricPriority.textContent = priority.length;
+      els.metricActivities.textContent = activityCount;
+      els.metricAvgScore.textContent = avg;
+    }
+
+    function renderClientList() {
+      const clients = visibleClients();
+      if (!clients.length) {
+        els.clientList.innerHTML = `<div class="empty">这里暂时安静。换一个筛选条件，或新建一位需要被陪伴的人。</div>`;
+        return;
+      }
+      els.clientList.innerHTML = clients.map((client) => {
+        const score = activityScore(client);
+        return `
+          <button class="client-item ${client.id === state.selectedClientId ? "active" : ""}" type="button" data-client-id="${escapeHtml(client.id)}">
+            <span class="avatar">${lastChar(client.name)}</span>
+            <span>
+              <span class="client-name">
+                ${escapeHtml(client.name)}
+                ${isPriorityClient(client) ? `<span class="badge">重点</span>` : ""}
+              </span>
+              <span class="client-meta">${escapeHtml(client.stage)} · ${escapeHtml(client.category)}<br>${escapeHtml(client.occupation || "未填写职业")}</span>
+            </span>
+            <span class="score"><strong>${score}</strong><small>活跃</small></span>
+          </button>
+        `;
+      }).join("");
+      els.clientList.querySelectorAll("[data-client-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selectedClientId = button.dataset.clientId;
+          saveAndRender();
+        });
+      });
+    }
+
+    function renderDetail() {
+      const client = selectedClient();
+      if (!client) {
+        els.clientDetail.innerHTML = `<div class="empty">还没有客户档案。先为一段新的陪伴关系留出位置。</div>`;
+        return;
+      }
+      const score = activityScore(client);
+      els.clientDetail.innerHTML = `
+        <div class="detail-top">
+          <div class="identity">
+            <span class="avatar big">${lastChar(client.name)}</span>
+            <div>
+              <h2>${escapeHtml(client.name)}</h2>
+              <p>${escapeHtml(client.age || "")}岁 · ${escapeHtml(client.phone || "未填写电话")}<br>微信：${escapeHtml(client.wechat || "未填写")} · ${escapeHtml(client.occupation || "未填写职业")}</p>
+              <div class="badges">
+                <span class="badge">${escapeHtml(client.stage)}</span>
+                <span class="badge">${escapeHtml(client.category)}</span>
+                ${(client.tags || []).map((tag) => `<span class="badge line">${escapeHtml(tag)}</span>`).join("")}
+              </div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn ghost" type="button" id="editClientBtn">编辑档案</button>
+            <button class="btn ghost" type="button" id="deleteClientBtn">删除</button>
+          </div>
+        </div>
+        <div class="story-grid">
+          <div>
+            <div class="section">
+              <h3>当前需求</h3>
+              <p>${escapeHtml(client.needs || "还没有记录。")}</p>
+            </div>
+            <div class="section">
+              <h3>客户状况</h3>
+              <p>${escapeHtml(client.situation || "还没有记录。")}</p>
+            </div>
+            <div class="section">
+              <h3>基础信息</h3>
+              <p>婚育情况：${escapeHtml(client.marriage || "未填写")}<br>推荐人：${escapeHtml(client.referrerName || "未填写")}<br>档案建立：${escapeHtml(client.createdAt || "")}</p>
+            </div>
+          </div>
+          <div>
+            <div class="section">
+              <h3>课程信息</h3>
+              <p>已报课程：${escapeHtml(client.enrolledCourses || "未填写")}<br>已上课程：${escapeHtml(client.attendedCourses || "未填写")}</p>
+              <div class="course-meter">
+                <div class="meter-line"><div class="meter-fill" style="width:${Number(client.courseRecognition || 0)}%"></div></div>
+                <p style="margin-top:10px;">课程认可度 ${Number(client.courseRecognition || 0)} / 100</p>
+              </div>
+            </div>
+            <div class="section">
+              <h3>活跃度</h3>
+              <p><span style="font-size:52px;line-height:1;color:var(--warm-wheat);">${score}</span><br>${priorityReason(client)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById("editClientBtn").addEventListener("click", () => openClientModal(client.id));
+      document.getElementById("deleteClientBtn").addEventListener("click", () => deleteClient(client.id));
+    }
+
+    function renderTimeline() {
+      const client = selectedClient();
+      if (!client) {
+        els.timeline.innerHTML = `<div class="empty">选择一位客户后，会看到她的陪伴轨迹。</div>`;
+        return;
+      }
+      const follows = state.followUps
+        .filter((follow) => follow.clientId === client.id)
+        .map((follow) => ({
+          kind: "陪伴",
+          date: follow.date,
+          title: follow.emotion || "陪伴记录",
+          body: `${follow.content || ""}${follow.nextAction ? " 下一步：" + follow.nextAction : ""}`,
+          status: follow.done ? "已完成" : (follow.remindDate ? `提醒 ${follow.remindDate}` : "无提醒")
+        }));
+      const activities = state.activities
+        .filter((activity) => activity.participantClientIds.includes(client.id))
+        .map((activity) => ({
+          kind: activity.type,
+          date: activity.date,
+          title: activity.title,
+          body: activity.feedback || "已记录参与。",
+          status: activity.attended ? "已到场" : "待参加"
+        }));
+      const items = [...follows, ...activities].sort((a, b) => b.date.localeCompare(a.date));
+      if (!items.length) {
+        els.timeline.innerHTML = `<div class="empty">还没有轨迹。写下第一条陪伴记录，就有了开始。</div>`;
+        return;
+      }
+      els.timeline.innerHTML = items.map((item) => `
+        <article class="timeline-item">
+          <div class="timeline-date">${escapeHtml(item.date)}</div>
+          <div class="timeline-title">
+            <span>${escapeHtml(item.title)}</span>
+            <span class="badge">${escapeHtml(item.kind)}</span>
+          </div>
+          <div class="timeline-copy">${escapeHtml(item.body)}</div>
+          <div class="badges"><span class="badge line">${escapeHtml(item.status)}</span></div>
+        </article>
+      `).join("");
+    }
+
+    function renderFunnel() {
+      const clients = visibleClients();
+      const stages = [
+        ["潜在客户", "初识"],
+        ["体验", "体验"],
+        ["成交", "确认"],
+        ["复购", "长期陪伴"]
+      ];
+      const max = Math.max(1, ...stages.map(([stage]) => clients.filter((client) => client.stage === stage).length));
+      els.funnelBars.innerHTML = stages.map(([stage, label], index) => {
+        const count = clients.filter((client) => client.stage === stage).length;
+        const width = Math.max(12, Math.round((count / max) * 100));
+        const colors = ["#FAE07A", "#F5C842", "#E8B420", "#C8924A"];
+        return `
+          <div class="funnel-row">
+            <strong>${label}</strong>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${colors[index]};">${stage}</div></div>
+            <span>${count} 位</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRoster() {
+      if (!state.activities.length) {
+        els.rosterActivitySelect.innerHTML = `<option value="">还没有活动</option>`;
+        els.rosterSummary.innerHTML = `<span class="badge line">先新建一个活动，再录入报名名单。</span>`;
+        els.rosterTableBody.innerHTML = `<tr><td colspan="8">还没有可管理的活动名单。</td></tr>`;
+        return;
+      }
+      if (!state.activities.some((activity) => activity.id === state.selectedActivityId)) {
+        state.selectedActivityId = state.activities[0].id;
+      }
+      els.rosterActivitySelect.innerHTML = state.activities.map((activity) => `
+        <option value="${escapeAttr(activity.id)}"${activity.id === state.selectedActivityId ? " selected" : ""}>
+          ${escapeHtml(activity.date)} · ${escapeHtml(activity.title)}
+        </option>
+      `).join("");
+
+      const activity = selectedActivity();
+      const roster = activity?.roster || [];
+      const matched = roster.filter((row) => row.clientId).length;
+      const checked = roster.filter((row) => row.checkedIn).length;
+      els.rosterSummary.innerHTML = `
+        <span class="badge">报名 ${roster.length} 人</span>
+        <span class="badge">已匹配 ${matched} 人</span>
+        <span class="badge">已签到 ${checked} 人</span>
+        <span class="badge line">${escapeHtml(activity?.type || "活动")} · ${escapeHtml(activity?.date || "")}</span>
+      `;
+
+      if (!roster.length) {
+        els.rosterTableBody.innerHTML = `<tr><td colspan="8">粘贴报名姓名后，系统会在客户档案里自动寻找对应客户。</td></tr>`;
+        return;
+      }
+      els.rosterTableBody.innerHTML = roster.map((row) => {
+        const client = state.clients.find((item) => item.id === row.clientId);
+        return `
+          <tr data-roster-id="${escapeAttr(row.id)}">
+            <td><strong>${escapeHtml(row.rawName || "未命名")}</strong></td>
+            <td>${clientSelectHtml(row.clientId)}</td>
+            <td>${escapeHtml(client?.referrerName || client?.ownerName || "未匹配")}</td>
+            <td>${client ? `${escapeHtml(client.category)}<br>${escapeHtml(client.stage)}` : "未匹配"}</td>
+            <td>${client ? `${escapeHtml(client.phone || "未填")}<br>${escapeHtml(client.wechat || "未填")}` : "未匹配"}</td>
+            <td>${client ? `${escapeHtml(client.enrolledCourses || "未填")}<br>${escapeHtml(client.attendedCourses || "未填")}` : "未匹配"}</td>
+            <td>${client ? `${escapeHtml(client.needs || "未填")}<br>${escapeHtml(client.situation || "未填")}` : "未匹配"}</td>
+            <td>
+              <label class="roster-check">
+                <input type="checkbox" class="roster-check-input" ${row.checkedIn ? "checked" : ""} />
+                已到
+              </label>
+            </td>
+          </tr>
+        `;
+      }).join("");
+      els.rosterTableBody.querySelectorAll(".roster-match-select").forEach((select) => {
+        select.addEventListener("change", (event) => {
+          updateRosterRow(event.target.closest("tr").dataset.rosterId, { clientId: event.target.value });
+        });
+      });
+      els.rosterTableBody.querySelectorAll(".roster-check-input").forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
+          updateRosterRow(event.target.closest("tr").dataset.rosterId, { checkedIn: event.target.checked });
+        });
+      });
+    }
+
+    function selectedActivity() {
+      return state.activities.find((activity) => activity.id === state.selectedActivityId) || state.activities[0] || null;
+    }
+
+    function clientSelectHtml(selectedId) {
+      const options = [
+        `<option value="">未匹配</option>`,
+        ...state.clients.map((client) => `
+          <option value="${escapeAttr(client.id)}"${client.id === selectedId ? " selected" : ""}>
+            ${escapeHtml(client.name)} · ${escapeHtml(client.referrerName || client.ownerName || "未填推荐人")}
+          </option>
+        `)
+      ].join("");
+      return `<select class="roster-match-select">${options}</select>`;
+    }
+
+    function updateRosterRow(rowId, patch) {
+      const activity = selectedActivity();
+      if (!activity) return;
+      activity.roster = (activity.roster || []).map((row) => row.id === rowId ? { ...row, ...patch } : row);
+      syncActivityParticipants(activity);
+      saveAndRender();
+    }
+
+    function importRosterNames() {
+      const activity = selectedActivity();
+      if (!activity) return toast("请先新建或选择一个活动。");
+      const names = els.rosterNameInput.value
+        .split(/[\n,，、;；]+/)
+        .map((name) => name.trim())
+        .filter(Boolean);
+      if (!names.length) return toast("请先录入报名姓名。");
+      activity.roster ||= [];
+      let added = 0;
+      names.forEach((rawName) => {
+        if (activity.roster.some((row) => row.rawName === rawName)) return;
+        const client = findClientByName(rawName);
+        activity.roster.push({
+          id: uid("r"),
+          rawName,
+          clientId: client?.id || "",
+          checkedIn: false
+        });
+        added += 1;
+      });
+      syncActivityParticipants(activity);
+      els.rosterNameInput.value = "";
+      toast(`已录入 ${added} 位报名人。`);
+      saveAndRender();
+    }
+
+    function findClientByName(rawName) {
+      const compact = rawName.replace(/\s/g, "");
+      return state.clients.find((client) => client.name === rawName)
+        || state.clients.find((client) => client.name.replace(/\s/g, "") === compact)
+        || state.clients.find((client) => client.name.includes(rawName) || rawName.includes(client.name));
+    }
+
+    function syncActivityParticipants(activity) {
+      activity.participantClientIds = [...new Set((activity.roster || []).map((row) => row.clientId).filter(Boolean))];
+      activity.attended = (activity.roster || []).length > 0 && activity.roster.every((row) => row.checkedIn);
+    }
+
+    function exportRoster() {
+      const activity = selectedActivity();
+      if (!activity) return toast("请先选择一个活动。");
+      const roster = activity.roster || [];
+      if (!roster.length) return toast("当前活动还没有报名名单。");
+      const rows = roster.map((row, index) => {
+        const client = state.clients.find((item) => item.id === row.clientId);
+        return {
+          "序号": index + 1,
+          "报名姓名": row.rawName,
+          "匹配客户": client?.name || "",
+          "推荐人": client?.referrerName || client?.ownerName || "",
+          "客户分类": client?.category || "",
+          "当前阶段": client?.stage || "",
+          "电话": client?.phone || "",
+          "微信": client?.wechat || "",
+          "职业": client?.occupation || "",
+          "已报课程": client?.enrolledCourses || "",
+          "已上课程": client?.attendedCourses || "",
+          "课程认可度": client?.courseRecognition ?? "",
+          "客户需求": client?.needs || "",
+          "客户状况": client?.situation || "",
+          "签到": row.checkedIn ? "已到" : "未到"
+        };
+      });
+      downloadCsv(`${activity.title}_报名签到名单_${activity.date || today()}.csv`, rows);
+      toast("名单已下载。");
+    }
+
+    function downloadCsv(filename, rows) {
+      const headers = Object.keys(rows[0]);
+      const csv = [
+        headers.join(","),
+        ...rows.map((row) => headers.map((header) => csvCell(row[header])).join(","))
+      ].join("\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      const text = String(value ?? "");
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+
+    function activityScore(client) {
+      let score = 0;
+      if ((client.enrolledCourses || "").trim()) score += 25;
+      if ((client.attendedCourses || "").trim()) score += 20;
+      score += Math.min(25, Math.round(Number(client.courseRecognition || 0) * 0.25));
+      const recentActivity = state.activities.some((activity) => {
+        return activity.participantClientIds.includes(client.id) && daysBetween(activity.date, today()) <= 30;
+      });
+      if (recentActivity) score += 15;
+      const recentFollow = state.followUps.some((follow) => {
+        return follow.clientId === client.id && daysBetween(follow.date, today()) <= 14;
+      });
+      if (recentFollow) score += 15;
+      return Math.max(0, Math.min(100, score));
+    }
+
+    function priorityScore(client) {
+      return isPriorityClient(client) ? 1 : 0;
+    }
+
+    function isPriorityClient(client) {
+      const overdue = state.followUps.some((follow) => follow.clientId === client.id && !follow.done && follow.remindDate && follow.remindDate <= today());
+      const sensitive = /压力|焦虑|睡眠|疲惫/.test(`${client.situation || ""}${client.needs || ""}${(client.tags || []).join("")}`);
+      return overdue || ["成交", "复购"].includes(client.stage) || activityScore(client) < 45 || sensitive;
+    }
+
+    function priorityReason(client) {
+      if (state.followUps.some((follow) => follow.clientId === client.id && !follow.done && follow.remindDate && follow.remindDate <= today())) return "有一条提醒正在等待回应。";
+      if (["成交", "复购"].includes(client.stage)) return "关系已经进入较深阶段，适合保持稳定陪伴。";
+      if (activityScore(client) < 45) return "近期活跃度偏低，适合轻轻问候。";
+      return "状态稳定，可以按节奏陪伴。";
+    }
+
+    function daysBetween(dateA, dateB) {
+      const a = new Date(dateA + "T00:00:00");
+      const b = new Date(dateB + "T00:00:00");
+      return Math.abs(Math.round((b - a) / 86400000));
+    }
+
+    function openModal(title, bodyHtml, onSubmit) {
+      els.modalTitle.textContent = title;
+      els.modalBody.innerHTML = bodyHtml;
+      els.modalBackdrop.classList.add("show");
+      const form = els.modalBody.querySelector("form");
+      if (form) {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          onSubmit(new FormData(form));
+        });
+      }
+      const firstInput = els.modalBody.querySelector("input,select,textarea");
+      if (firstInput) firstInput.focus();
+    }
+
+    function closeModal() {
+      els.modalBackdrop.classList.remove("show");
+      els.modalBody.innerHTML = "";
+    }
+
+    function openUserModal() {
+      openModal("新增使用者", `
+        <form>
+          <div class="form-field full">
+            <label>使用者姓名</label>
+            <input class="input" name="name" required placeholder="例如：林老师" />
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" type="button" onclick="document.getElementById('closeModalBtn').click()">取消</button>
+            <button class="btn primary" type="submit">保存</button>
+          </div>
+        </form>
+      `, (data) => {
+        const name = data.get("name").trim();
+        if (!name) return;
+        const user = { id: uid("u"), name };
+        state.users.push(user);
+        state.currentUserId = user.id;
+        closeModal();
+        toast("已新增使用者。");
+        saveAndRender();
+      });
+    }
+
+    function openClientModal(clientId) {
+      const client = state.clients.find((item) => item.id === clientId);
+      const user = currentUser();
+      openModal(client ? "编辑客户档案" : "新增客户档案", `
+        <form>
+          <div class="form-grid">
+            ${inputField("姓名", "name", client?.name || "", true)}
+            ${inputField("年龄", "age", client?.age || "", false, "number")}
+            ${inputField("电话", "phone", client?.phone || "")}
+            ${inputField("微信号", "wechat", client?.wechat || "")}
+            ${inputField("职业", "occupation", client?.occupation || "")}
+            ${inputField("婚育情况", "marriage", client?.marriage || "")}
+            ${inputField("推荐人姓名", "referrerName", client?.referrerName || user.name)}
+            ${inputField("归属使用者", "ownerName", client?.ownerName || user.name)}
+            ${selectField("客户分类", "category", client?.category || "新老朋友", ["正式课程学员", "公益课学员", "新老朋友"])}
+            ${selectField("当前阶段", "stage", client?.stage || "潜在客户", ["潜在客户", "体验", "成交", "复购"])}
+            ${inputField("已报课程", "enrolledCourses", client?.enrolledCourses || "", false, "text", true)}
+            ${inputField("已上课程", "attendedCourses", client?.attendedCourses || "", false, "text", true)}
+            ${inputField("课程认可度", "courseRecognition", client?.courseRecognition ?? 60, false, "number")}
+            ${inputField("标签（用逗号分隔）", "tags", (client?.tags || []).join("，"), false, "text", true)}
+            ${textareaField("客户需求", "needs", client?.needs || "")}
+            ${textareaField("客户状况", "situation", client?.situation || "")}
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" type="button" onclick="document.getElementById('closeModalBtn').click()">取消</button>
+            <button class="btn primary" type="submit">保存档案</button>
+          </div>
+        </form>
+      `, (data) => {
+        const payload = {
+          id: client?.id || uid("c"),
+          name: data.get("name").trim(),
+          age: Number(data.get("age")) || "",
+          phone: data.get("phone").trim(),
+          wechat: data.get("wechat").trim(),
+          occupation: data.get("occupation").trim(),
+          marriage: data.get("marriage").trim(),
+          referrerName: data.get("referrerName").trim(),
+          ownerName: data.get("ownerName").trim(),
+          category: data.get("category"),
+          stage: data.get("stage"),
+          enrolledCourses: data.get("enrolledCourses").trim(),
+          attendedCourses: data.get("attendedCourses").trim(),
+          courseRecognition: Math.max(0, Math.min(100, Number(data.get("courseRecognition")) || 0)),
+          needs: data.get("needs").trim(),
+          situation: data.get("situation").trim(),
+          tags: data.get("tags").split(/[，,]/).map((tag) => tag.trim()).filter(Boolean),
+          createdAt: client?.createdAt || today()
+        };
+        if (!payload.name) return toast("请填写客户姓名。");
+        if (client) {
+          state.clients = state.clients.map((item) => item.id === client.id ? payload : item);
+        } else {
+          state.clients.unshift(payload);
+          state.selectedClientId = payload.id;
+        }
+        closeModal();
+        toast("客户档案已保存。");
+        saveAndRender();
+      });
+    }
+
+    function openFollowModal() {
+      const client = selectedClient();
+      if (!client) return toast("请先选择一位客户。");
+      openModal("记录一次陪伴", `
+        <form>
+          <div class="form-grid">
+            ${inputField("日期", "date", today(), true, "date")}
+            ${selectField("情绪状态", "emotion", "平静", ["平静", "期待", "困惑", "焦虑", "感恩", "喜悦"])}
+            ${textareaField("记录内容", "content", "")}
+            ${textareaField("下一步动作", "nextAction", "")}
+            ${inputField("提醒日期", "remindDate", "", false, "date")}
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" type="button" onclick="document.getElementById('closeModalBtn').click()">取消</button>
+            <button class="btn primary" type="submit">保存记录</button>
+          </div>
+        </form>
+      `, (data) => {
+        const content = data.get("content").trim();
+        if (content.length < 2) return toast("请写下陪伴内容。");
+        state.followUps.unshift({
+          id: uid("f"),
+          clientId: client.id,
+          date: data.get("date") || today(),
+          emotion: data.get("emotion"),
+          content,
+          nextAction: data.get("nextAction").trim(),
+          remindDate: data.get("remindDate"),
+          done: false
+        });
+        closeModal();
+        toast("陪伴记录已保存。");
+        saveAndRender();
+      });
+    }
+
+    function openActivityModal() {
+      const clients = visibleClients();
+      if (!clients.length) return toast("请先新增客户。");
+      const options = clients.map((client) => `
+        <label style="display:flex;gap:8px;align-items:center;margin:8px 0;">
+          <input type="checkbox" name="participants" value="${escapeHtml(client.id)}" ${client.id === state.selectedClientId ? "checked" : ""} />
+          ${escapeHtml(client.name)}
+        </label>
+      `).join("");
+      openModal("记录沙龙 / 课程", `
+        <form>
+          <div class="form-grid">
+            ${inputField("活动名称", "title", "", true)}
+            ${inputField("日期", "date", today(), true, "date")}
+            ${selectField("类型", "type", "主题沙龙", ["主题沙龙", "课程", "公益课", "咨询"])}
+            ${selectField("是否到场", "attended", "true", [["true", "已到场"], ["false", "待参加"]])}
+            <div class="form-field full">
+              <label>参与客户</label>
+              <div style="padding:10px 14px;border:1px solid var(--soft-line);border-radius:var(--radius-sm);background:rgba(255,253,242,.72);">${options}</div>
+            </div>
+            ${textareaField("反馈与观察", "feedback", "")}
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" type="button" onclick="document.getElementById('closeModalBtn').click()">取消</button>
+            <button class="btn primary" type="submit">保存活动</button>
+          </div>
+        </form>
+      `, (data) => {
+        const participants = data.getAll("participants");
+        if (!data.get("title").trim()) return toast("请填写活动名称。");
+        if (!participants.length) return toast("请选择参与客户。");
+        const activity = {
+          id: uid("a"),
+          title: data.get("title").trim(),
+          date: data.get("date") || today(),
+          type: data.get("type"),
+          participantClientIds: participants,
+          roster: participants.map((clientId) => {
+            const client = state.clients.find((item) => item.id === clientId);
+            return {
+              id: uid("r"),
+              rawName: client?.name || "",
+              clientId,
+              checkedIn: data.get("attended") === "true"
+            };
+          }),
+          feedback: data.get("feedback").trim(),
+          attended: data.get("attended") === "true"
+        };
+        state.activities.unshift(activity);
+        state.selectedActivityId = activity.id;
+        closeModal();
+        toast("活动已保存。");
+        saveAndRender();
+      });
+    }
+
+    function inputField(label, name, value, required = false, type = "text", full = false) {
+      return `
+        <div class="form-field ${full ? "full" : ""}">
+          <label>${label}</label>
+          <input class="input" name="${name}" type="${type}" value="${escapeAttr(value)}" ${required ? "required" : ""} />
+        </div>
+      `;
+    }
+
+    function textareaField(label, name, value) {
+      return `
+        <div class="form-field full">
+          <label>${label}</label>
+          <textarea class="textarea" name="${name}">${escapeHtml(value)}</textarea>
+        </div>
+      `;
+    }
+
+    function selectField(label, name, value, options) {
+      const opts = options.map((option) => {
+        const val = Array.isArray(option) ? option[0] : option;
+        const text = Array.isArray(option) ? option[1] : option;
+        return `<option value="${escapeAttr(val)}"${val === value ? " selected" : ""}>${escapeHtml(text)}</option>`;
+      }).join("");
+      return `
+        <div class="form-field">
+          <label>${label}</label>
+          <select class="select" name="${name}">${opts}</select>
+        </div>
+      `;
+    }
+
+    function deleteClient(clientId) {
+      const client = state.clients.find((item) => item.id === clientId);
+      if (!client) return;
+      if (!confirm(`确认删除「${client.name}」的档案和相关陪伴记录吗？`)) return;
+      state.clients = state.clients.filter((item) => item.id !== clientId);
+      state.followUps = state.followUps.filter((item) => item.clientId !== clientId);
+      state.activities = state.activities.map((activity) => ({
+        ...activity,
+        participantClientIds: activity.participantClientIds.filter((id) => id !== clientId)
+      })).filter((activity) => activity.participantClientIds.length);
+      state.selectedClientId = null;
+      toast("客户档案已删除。");
+      saveAndRender();
+    }
+
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `境心客户陪伴系统备份_${today()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast("备份文件已导出。");
+    }
+
+    function createShareView() {
+      const shareState = {
+        exportedAt: new Date().toISOString(),
+        users: state.users,
+        clients: state.clients,
+        activities: state.activities,
+        followUps: state.followUps
+      };
+      const encoded = encodeShareData(shareState);
+      const base = new URL("share.html", window.location.href);
+      base.hash = `data=${encoded}`;
+      const publicBase = getSharePublicBaseUrl();
+      const publicLink = publicBase ? `${publicBase}#data=${encoded}` : "";
+      copyText(base.href);
+      openModal("共享查看链接", `
+        <div class="form-field full">
+          <label>电脑本地预览链接</label>
+          <textarea class="textarea" readonly style="min-height:130px;">${escapeHtml(base.href)}</textarea>
+        </div>
+        <div class="form-field full" style="margin-top:14px;">
+          <label>推荐人手机可打开链接</label>
+          <textarea class="textarea" readonly style="min-height:130px;">${escapeHtml(publicLink || "还没有设置线上 share.html 地址。请先点击「线上地址」，填入公网 share.html 链接。")}</textarea>
+        </div>
+        <p style="margin:14px 0 0;color:var(--umber);line-height:1.7;">手机无法打开 <strong>file://</strong> 本地路径。需要先把 <strong>mobile-share-site/share.html</strong> 上传到静态网页空间，再在「线上地址」里填写公网地址。</p>
+        <div class="modal-actions">
+          <button class="btn ghost" type="button" onclick="navigator.clipboard?.writeText(document.querySelectorAll('#modalBody textarea')[1].value)">复制手机链接</button>
+          <button class="btn ghost" type="button" id="setShareBaseFromModalBtn">设置线上地址</button>
+          <a class="btn primary" href="${escapeAttr(base.href)}" target="_blank" rel="noopener" style="text-decoration:none;">打开共享页</a>
+        </div>
+      `, () => {});
+      const setButton = document.getElementById("setShareBaseFromModalBtn");
+      if (setButton) setButton.addEventListener("click", openShareBaseModal);
+      toast("共享查看链接已生成。");
+    }
+
+    function openShareBaseModal() {
+      const current = getSharePublicBaseUrl();
+      openModal("设置线上共享地址", `
+        <form>
+          <div class="form-field full">
+            <label>公网 share.html 地址</label>
+            <input class="input" name="shareBase" value="${escapeAttr(current)}" placeholder="例如：https://your-site.netlify.app/share.html" />
+          </div>
+          <p style="margin:12px 0 0;color:var(--umber);line-height:1.7;">把 <strong>mobile-share-site</strong> 文件夹上传到 Netlify、Vercel、GitHub Pages、Cloudflare Pages 等静态网站后，将其中的 <strong>share.html</strong> 公网地址填在这里。之后生成的共享链接就能在推荐人手机上直接打开。</p>
+          <div class="modal-actions">
+            <button class="btn ghost" type="button" onclick="localStorage.removeItem('jingxin-share-base-url');document.getElementById('closeModalBtn').click()">清除</button>
+            <button class="btn primary" type="submit">保存地址</button>
+          </div>
+        </form>
+      `, (data) => {
+        const value = data.get("shareBase").trim();
+        if (value && !/^https?:\/\//.test(value)) return toast("请填写 http 或 https 开头的网址。");
+        localStorage.setItem("jingxin-share-base-url", value);
+        closeModal();
+        toast("线上共享地址已保存。");
+      });
+    }
+
+    function getSharePublicBaseUrl() {
+      const value = (localStorage.getItem("jingxin-share-base-url") || "").trim();
+      if (!value) return "";
+      try {
+        const url = new URL(value, window.location.href);
+        url.hash = "";
+        return url.href;
+      } catch {
+        return "";
+      }
+    }
+
+    function encodeShareData(data) {
+      const json = JSON.stringify(data);
+      const bytes = new TextEncoder().encode(json);
+      let binary = "";
+      bytes.forEach((byte) => binary += String.fromCharCode(byte));
+      return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      }
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!Array.isArray(parsed.clients) || !Array.isArray(parsed.users)) {
+            throw new Error("Invalid backup");
+          }
+          state = { ...structuredClone(seedState), ...parsed };
+          ensureValidSelection();
+          saveAndRender();
+          toast("备份已导入。");
+        } catch {
+          toast("导入失败，请确认是有效的 JSON 备份。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetSeed() {
+      if (!confirm("确认恢复示例数据？当前本地数据会被覆盖。")) return;
+      state = structuredClone(seedState);
+      saveAndRender();
+      toast("已恢复示例数据。");
+    }
+
+    function toast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => els.toast.classList.remove("show"), 2200);
+    }
+
+    function lastChar(value) {
+      const chars = Array.from(value || "屋");
+      return escapeHtml(chars[chars.length - 1] || "屋");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll("\n", " ");
+    }
+  </script>
+</body>
+</html>
