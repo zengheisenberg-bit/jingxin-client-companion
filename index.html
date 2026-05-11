@@ -60,6 +60,61 @@
       cursor: pointer;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 18px;
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      padding: 34px;
+      border: 1px solid rgba(92, 74, 40, 0.12);
+      border-radius: 30px;
+      background:
+        linear-gradient(150deg, rgba(255, 253, 242, 0.94), rgba(253, 245, 208, 0.66)),
+        repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(92, 74, 40, 0.04) 29px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .login-card h1 {
+      margin: 0;
+      font-family: var(--font-title);
+      font-size: clamp(34px, 5vw, 50px);
+      line-height: 1.08;
+      font-weight: 650;
+    }
+
+    .login-card p {
+      margin: 14px 0 26px;
+      color: var(--umber);
+      line-height: 1.72;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .login-hint {
+      margin-top: 16px;
+      color: rgba(92, 74, 40, 0.72);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .login-error {
+      min-height: 20px;
+      color: #8A3D20;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     .app-shell {
       width: min(1380px, calc(100% - 44px));
       margin: 0 auto;
@@ -1063,7 +1118,27 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <section class="login-screen" id="loginScreen" aria-labelledby="loginTitle">
+    <div class="login-card">
+      <h1 id="loginTitle">境心客户陪伴系统</h1>
+      <p>请先登录。管理员可以新增推荐人账号并维护数据，推荐人账号用于查看自己相关的客户陪伴情况。</p>
+      <form class="login-form" id="loginForm">
+        <div class="form-field full">
+          <label>账号</label>
+          <input class="input" id="loginUsername" name="username" autocomplete="username" required placeholder="请输入账号" />
+        </div>
+        <div class="form-field full">
+          <label>密码</label>
+          <input class="input" id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="请输入密码" />
+        </div>
+        <div class="login-error" id="loginError" role="alert"></div>
+        <button class="btn primary" type="submit">登录</button>
+      </form>
+      <div class="login-hint">初始管理员账号：admin，密码：admin123。上线正式使用前请由管理员修改账号密码，并定期导出备份。</div>
+    </div>
+  </section>
+
+  <div class="app-shell hidden" id="appShell">
     <header class="topbar">
       <div class="brand">
         <h1>境心客户陪伴系统</h1>
@@ -1073,12 +1148,14 @@
         <label class="field-inline">当前使用者
           <select id="currentUserSelect"></select>
         </label>
-        <button class="btn ghost" id="addUserBtn" type="button">新增使用者</button>
-        <button class="btn ghost" id="exportBtn" type="button">导出备份</button>
+        <span class="field-inline" id="currentRoleBadge">未登录</span>
+        <button class="btn ghost admin-only" id="addUserBtn" type="button">新增推荐人</button>
+        <button class="btn ghost admin-only" id="exportBtn" type="button">导出备份</button>
         <button class="btn ghost" id="shareViewBtn" type="button">共享查看</button>
-        <button class="btn ghost" id="shareBaseBtn" type="button">线上地址</button>
-        <button class="btn ghost" id="importBtn" type="button">导入备份</button>
-        <button class="btn ghost" id="resetBtn" type="button">恢复示例</button>
+        <button class="btn ghost admin-only" id="shareBaseBtn" type="button">线上地址</button>
+        <button class="btn ghost admin-only" id="importBtn" type="button">导入备份</button>
+        <button class="btn ghost admin-only" id="resetBtn" type="button">恢复示例</button>
+        <button class="btn ghost" id="logoutBtn" type="button">退出登录</button>
         <input class="file-input" id="importFile" type="file" accept="application/json,.json" />
       </div>
     </header>
@@ -1103,7 +1180,7 @@
       <aside class="panel" aria-label="客户列表">
         <div class="panel-head">
           <h2 class="panel-title">陪伴名单</h2>
-          <button class="btn primary" id="newClientBtn" type="button">新增客户</button>
+          <button class="btn primary admin-only" id="newClientBtn" type="button">新增客户</button>
         </div>
         <div class="filters">
           <input class="search" id="searchInput" type="search" placeholder="搜索姓名、微信、课程、状态" />
@@ -1134,8 +1211,8 @@
         <div class="panel-head">
           <h2 class="panel-title">陪伴时间线</h2>
           <div>
-            <button class="btn ghost" id="newFollowBtn" type="button">记录陪伴</button>
-            <button class="btn ghost" id="newActivityBtn" type="button">记录活动</button>
+            <button class="btn ghost admin-only" id="newFollowBtn" type="button">记录陪伴</button>
+            <button class="btn ghost admin-only" id="newActivityBtn" type="button">记录活动</button>
           </div>
         </div>
         <div class="timeline" id="timeline"></div>
@@ -1153,14 +1230,14 @@
           <h2 class="panel-title">活动报名与签到名单</h2>
           <p style="margin:6px 0 0;color:var(--umber);font-size:12px;line-height:1.6;">录入报名姓名后会自动匹配客户档案，也可以手动选择对应客户后导出名单。</p>
         </div>
-        <button class="btn primary" id="newRosterActivityBtn" type="button">新建活动</button>
+        <button class="btn primary admin-only" id="newRosterActivityBtn" type="button">新建活动</button>
       </div>
       <div class="roster-tools">
         <select class="select" id="rosterActivitySelect" aria-label="选择活动"></select>
-        <textarea class="textarea roster-textarea" id="rosterNameInput" placeholder="批量录入报名姓名：每行一个姓名，也可用顿号、逗号分隔"></textarea>
-        <button class="btn ghost" id="importRosterBtn" type="button">录入报名</button>
+        <textarea class="textarea roster-textarea admin-only" id="rosterNameInput" placeholder="批量录入报名姓名：每行一个姓名，也可用顿号、逗号分隔"></textarea>
+        <button class="btn ghost admin-only" id="importRosterBtn" type="button">录入报名</button>
         <button class="btn ghost" id="exportRosterBtn" type="button">下载名单</button>
-        <button class="btn ghost" id="clearRosterInputBtn" type="button">清空输入</button>
+        <button class="btn ghost admin-only" id="clearRosterInputBtn" type="button">清空输入</button>
       </div>
       <div class="roster-summary" id="rosterSummary"></div>
       <div class="roster-table-wrap">
@@ -1202,9 +1279,11 @@
 
     const seedState = {
       users: [
-        { id: "u1", name: "林老师" },
-        { id: "u2", name: "许老师" }
+        { id: "admin", name: "管理员", username: "admin", password: "admin123", role: "admin" },
+        { id: "u1", name: "林老师", username: "lin", password: "123456", role: "advisor" },
+        { id: "u2", name: "许老师", username: "xu", password: "123456", role: "advisor" }
       ],
+      currentLoginId: "",
       currentUserId: "u1",
       selectedClientId: "c1",
       clients: [
@@ -1366,7 +1445,8 @@
 
     function cacheElements() {
       [
-        "currentUserSelect", "addUserBtn", "exportBtn", "shareViewBtn", "shareBaseBtn", "importBtn", "resetBtn", "importFile",
+        "loginScreen", "appShell", "loginForm", "loginUsername", "loginPassword", "loginError",
+        "currentUserSelect", "currentRoleBadge", "addUserBtn", "exportBtn", "shareViewBtn", "shareBaseBtn", "importBtn", "resetBtn", "logoutBtn", "importFile",
         "todayReminderHero", "metricClients", "metricPriority", "metricActivities", "metricAvgScore",
         "newClientBtn", "searchInput", "stageFilter", "categoryFilter", "clientList", "clientDetail",
         "funnelBars", "newFollowBtn", "newActivityBtn", "timeline", "modalBackdrop", "modalTitle",
@@ -1377,7 +1457,10 @@
     }
 
     function bindEvents() {
+      els.loginForm.addEventListener("submit", handleLogin);
+      els.logoutBtn.addEventListener("click", logout);
       els.currentUserSelect.addEventListener("change", (event) => {
+        if (!isAdmin()) return;
         state.currentUserId = event.target.value;
         state.selectedClientId = null;
         ensureValidSelection();
@@ -1415,6 +1498,58 @@
       });
     }
 
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = els.loginUsername.value.trim();
+      const password = els.loginPassword.value;
+      const user = findLoginUser(username, password);
+      if (!user) {
+        els.loginError.textContent = "账号或密码不正确，请联系管理员确认。";
+        return;
+      }
+      state.currentLoginId = user.id;
+      if (user.role === "advisor") state.currentUserId = user.id;
+      if (user.role === "admin" && !state.users.some((item) => item.id === state.currentUserId && item.role !== "admin")) {
+        state.currentUserId = state.users.find((item) => item.role !== "admin")?.id || user.id;
+      }
+      els.loginPassword.value = "";
+      els.loginError.textContent = "";
+      saveAndRender();
+    }
+
+    function findLoginUser(username, password) {
+      const normalizedName = username.trim();
+      const normalizedPassword = String(password);
+      const admin = state.users.find((item) => item.role === "admin") || ensureAdminAccount();
+      if ((normalizedName === "admin" || normalizedName === "管理员") && normalizedPassword === "admin123") {
+        return admin;
+      }
+      return state.users.find((item) => {
+        const names = [item.username, item.name, item.id].filter(Boolean).map(String);
+        const passwordMatches = String(item.password || (item.role === "admin" ? "admin123" : "123456")) === normalizedPassword;
+        return passwordMatches && names.includes(normalizedName);
+      }) || null;
+    }
+
+    function ensureAdminAccount() {
+      let admin = state.users.find((item) => item.role === "admin");
+      if (!admin) {
+        admin = { id: "admin", name: "管理员", username: "admin", password: "admin123", role: "admin" };
+        state.users.unshift(admin);
+      } else {
+        admin.username ||= "admin";
+        admin.password ||= "admin123";
+        admin.name ||= "管理员";
+      }
+      return admin;
+    }
+
+    function logout() {
+      state.currentLoginId = "";
+      closeModal();
+      saveAndRender();
+    }
+
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -1427,14 +1562,64 @@
     }
 
     function normalizeState(nextState) {
-      nextState.users ||= structuredClone(seedState.users);
+      nextState.users = normalizeUsers(nextState.users || structuredClone(seedState.users));
       nextState.clients ||= [];
       nextState.activities ||= [];
       nextState.followUps ||= [];
-      nextState.currentUserId ||= nextState.users[0]?.id;
+      nextState.currentLoginId ||= "";
+      if (!nextState.users.some((user) => user.id === nextState.currentLoginId)) nextState.currentLoginId = "";
+      const advisors = nextState.users.filter((user) => user.role !== "admin");
+      nextState.currentUserId ||= advisors[0]?.id || nextState.users[0]?.id;
+      if (!nextState.users.some((user) => user.id === nextState.currentUserId)) {
+        nextState.currentUserId = advisors[0]?.id || nextState.users[0]?.id || "";
+      }
       nextState.activities = nextState.activities.map((activity) => ensureActivityRoster(activity, nextState.clients));
       nextState.selectedActivityId ||= nextState.activities[0]?.id || "";
       return nextState;
+    }
+
+    function normalizeUsers(users) {
+      const usedUsernames = new Set();
+      const normalized = (users || []).map((user, index) => {
+        const id = user.id || uid("u");
+        const role = user.role === "admin" ? "admin" : "advisor";
+        const fallbackName = role === "admin" ? "管理员" : `推荐人${index + 1}`;
+        const name = (user.name || fallbackName).trim();
+        const baseUsername = (user.username || defaultUsernameForUser(role, name, id)).trim();
+        let username = baseUsername || (role === "admin" ? "admin" : "advisor");
+        let suffix = 2;
+        while (usedUsernames.has(username)) {
+          username = `${baseUsername || "advisor"}${suffix}`;
+          suffix += 1;
+        }
+        usedUsernames.add(username);
+        return {
+          ...user,
+          id,
+          name,
+          username,
+          password: String(user.password || (role === "admin" ? "admin123" : "123456")),
+          role
+        };
+      });
+      if (!normalized.some((user) => user.role === "admin")) {
+        normalized.unshift({ id: "admin", name: "管理员", username: "admin", password: "admin123", role: "admin" });
+      }
+      return normalized;
+    }
+
+    function defaultUsernameForUser(role, name, id) {
+      if (role === "admin") return "admin";
+      if (id === "u1" || name.includes("林")) return "lin";
+      if (id === "u2" || name.includes("许")) return "xu";
+      return pinyinLikeUsername(name, id);
+    }
+
+    function pinyinLikeUsername(name, id) {
+      const ascii = String(name || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      return ascii || id || "advisor";
     }
 
     function ensureActivityRoster(activity, allClients = state.clients) {
@@ -1468,17 +1653,37 @@
       render();
     }
 
+    function currentLogin() {
+      return state.users.find((user) => user.id === state.currentLoginId) || null;
+    }
+
+    function isLoggedIn() {
+      return Boolean(currentLogin());
+    }
+
+    function isAdmin() {
+      return currentLogin()?.role === "admin";
+    }
+
+    function requireAdmin() {
+      if (isAdmin()) return true;
+      toast("当前账号仅可查看，请使用管理员账号编辑或上传。");
+      return false;
+    }
+
     function currentUser() {
-      return state.users.find((user) => user.id === state.currentUserId) || state.users[0];
+      if (!isAdmin()) return currentLogin();
+      return state.users.find((user) => user.id === state.currentUserId)
+        || state.users.find((user) => user.role !== "admin")
+        || currentLogin()
+        || state.users[0];
     }
 
     function visibleClients() {
-      const user = currentUser();
       const query = (els.searchInput?.value || "").trim().toLowerCase();
       const stage = els.stageFilter?.value || "all";
       const category = els.categoryFilter?.value || "all";
-      return state.clients
-        .filter((client) => client.ownerName === user.name || client.referrerName === user.name)
+      return scopedClients()
         .filter((client) => stage === "all" || client.stage === stage)
         .filter((client) => category === "all" || client.category === category)
         .filter((client) => {
@@ -1490,6 +1695,19 @@
           ].join(" ").toLowerCase().includes(query);
         })
         .sort((a, b) => priorityScore(b) - priorityScore(a) || activityScore(b) - activityScore(a));
+    }
+
+    function scopedClients() {
+      const login = currentLogin();
+      if (!login) return [];
+      if (isAdmin()) return state.clients;
+      return state.clients.filter((client) => client.ownerName === login.name || client.referrerName === login.name);
+    }
+
+    function scopedActivities() {
+      if (isAdmin()) return state.activities;
+      const clientIds = new Set(scopedClients().map((client) => client.id));
+      return state.activities.filter((activity) => activity.participantClientIds.some((id) => clientIds.has(id)));
     }
 
     function ensureValidSelection() {
@@ -1504,7 +1722,10 @@
     }
 
     function render() {
+      renderAuth();
+      if (!isLoggedIn()) return;
       ensureValidSelection();
+      renderPermissions();
       renderUsers();
       renderMetrics();
       renderClientList();
@@ -1514,8 +1735,31 @@
       renderRoster();
     }
 
+    function renderAuth() {
+      const loggedIn = isLoggedIn();
+      els.loginScreen.classList.toggle("hidden", loggedIn);
+      els.appShell.classList.toggle("hidden", !loggedIn);
+      if (!loggedIn) {
+        els.loginUsername.focus();
+      }
+    }
+
+    function renderPermissions() {
+      const admin = isAdmin();
+      document.querySelectorAll(".admin-only").forEach((element) => {
+        element.classList.toggle("hidden", !admin);
+      });
+      const login = currentLogin();
+      els.currentRoleBadge.textContent = login ? `${login.role === "admin" ? "管理员" : "推荐人"}：${login.name}` : "未登录";
+      els.currentUserSelect.disabled = !admin;
+    }
+
     function renderUsers() {
-      els.currentUserSelect.innerHTML = state.users
+      const users = isAdmin() ? state.users.filter((user) => user.role !== "admin") : [currentLogin()].filter(Boolean);
+      if (isAdmin() && users.length && !users.some((user) => user.id === state.currentUserId)) {
+        state.currentUserId = users[0].id;
+      }
+      els.currentUserSelect.innerHTML = users
         .map((user) => `<option value="${escapeHtml(user.id)}"${user.id === state.currentUserId ? " selected" : ""}>${escapeHtml(user.name)}</option>`)
         .join("");
     }
@@ -1594,10 +1838,12 @@
               </div>
             </div>
           </div>
-          <div class="detail-actions">
-            <button class="btn ghost" type="button" id="editClientBtn">编辑档案</button>
-            <button class="btn ghost" type="button" id="deleteClientBtn">删除</button>
-          </div>
+          ${isAdmin() ? `
+            <div class="detail-actions">
+              <button class="btn ghost" type="button" id="editClientBtn">编辑档案</button>
+              <button class="btn ghost" type="button" id="deleteClientBtn">删除</button>
+            </div>
+          ` : ""}
         </div>
         <div class="story-grid">
           <div>
@@ -1630,8 +1876,10 @@
           </div>
         </div>
       `;
-      document.getElementById("editClientBtn").addEventListener("click", () => openClientModal(client.id));
-      document.getElementById("deleteClientBtn").addEventListener("click", () => deleteClient(client.id));
+      if (isAdmin()) {
+        document.getElementById("editClientBtn").addEventListener("click", () => openClientModal(client.id));
+        document.getElementById("deleteClientBtn").addEventListener("click", () => deleteClient(client.id));
+      }
     }
 
     function renderTimeline() {
@@ -1700,23 +1948,26 @@
     }
 
     function renderRoster() {
-      if (!state.activities.length) {
+      const activities = scopedActivities();
+      if (!activities.length) {
         els.rosterActivitySelect.innerHTML = `<option value="">还没有活动</option>`;
-        els.rosterSummary.innerHTML = `<span class="badge line">先新建一个活动，再录入报名名单。</span>`;
+        els.rosterSummary.innerHTML = `<span class="badge line">${isAdmin() ? "先新建一个活动，再录入报名名单。" : "暂时没有与你相关的活动名单。"}</span>`;
         els.rosterTableBody.innerHTML = `<tr><td colspan="8">还没有可管理的活动名单。</td></tr>`;
         return;
       }
-      if (!state.activities.some((activity) => activity.id === state.selectedActivityId)) {
-        state.selectedActivityId = state.activities[0].id;
+      const admin = isAdmin();
+      if (!activities.some((activity) => activity.id === state.selectedActivityId)) {
+        state.selectedActivityId = activities[0].id;
       }
-      els.rosterActivitySelect.innerHTML = state.activities.map((activity) => `
+      els.rosterActivitySelect.innerHTML = activities.map((activity) => `
         <option value="${escapeAttr(activity.id)}"${activity.id === state.selectedActivityId ? " selected" : ""}>
           ${escapeHtml(activity.date)} · ${escapeHtml(activity.title)}
         </option>
       `).join("");
 
       const activity = selectedActivity();
-      const roster = activity?.roster || [];
+      const allowedClientIds = new Set(scopedClients().map((client) => client.id));
+      const roster = isAdmin() ? (activity?.roster || []) : (activity?.roster || []).filter((row) => row.clientId && allowedClientIds.has(row.clientId));
       const matched = roster.filter((row) => row.clientId).length;
       const checked = roster.filter((row) => row.checkedIn).length;
       els.rosterSummary.innerHTML = `
@@ -1735,7 +1986,7 @@
         return `
           <tr data-roster-id="${escapeAttr(row.id)}">
             <td><strong>${escapeHtml(row.rawName || "未命名")}</strong></td>
-            <td>${clientSelectHtml(row.clientId)}</td>
+            <td>${clientSelectHtml(row.clientId, !admin)}</td>
             <td>${escapeHtml(client?.referrerName || client?.ownerName || "未匹配")}</td>
             <td>${client ? `${escapeHtml(client.category)}<br>${escapeHtml(client.stage)}` : "未匹配"}</td>
             <td>${client ? `${escapeHtml(client.phone || "未填")}<br>${escapeHtml(client.wechat || "未填")}` : "未匹配"}</td>
@@ -1743,7 +1994,7 @@
             <td>${client ? `${escapeHtml(client.needs || "未填")}<br>${escapeHtml(client.situation || "未填")}` : "未匹配"}</td>
             <td>
               <label class="roster-check">
-                <input type="checkbox" class="roster-check-input" ${row.checkedIn ? "checked" : ""} />
+                <input type="checkbox" class="roster-check-input" ${row.checkedIn ? "checked" : ""} ${admin ? "" : "disabled"} />
                 已到
               </label>
             </td>
@@ -1763,22 +2014,24 @@
     }
 
     function selectedActivity() {
-      return state.activities.find((activity) => activity.id === state.selectedActivityId) || state.activities[0] || null;
+      const activities = scopedActivities();
+      return activities.find((activity) => activity.id === state.selectedActivityId) || activities[0] || null;
     }
 
-    function clientSelectHtml(selectedId) {
+    function clientSelectHtml(selectedId, disabled = false) {
       const options = [
         `<option value="">未匹配</option>`,
-        ...state.clients.map((client) => `
+        ...scopedClients().map((client) => `
           <option value="${escapeAttr(client.id)}"${client.id === selectedId ? " selected" : ""}>
             ${escapeHtml(client.name)} · ${escapeHtml(client.referrerName || client.ownerName || "未填推荐人")}
           </option>
         `)
       ].join("");
-      return `<select class="roster-match-select">${options}</select>`;
+      return `<select class="roster-match-select" ${disabled ? "disabled" : ""}>${options}</select>`;
     }
 
     function updateRosterRow(rowId, patch) {
+      if (!requireAdmin()) return;
       const activity = selectedActivity();
       if (!activity) return;
       activity.roster = (activity.roster || []).map((row) => row.id === rowId ? { ...row, ...patch } : row);
@@ -1787,6 +2040,7 @@
     }
 
     function importRosterNames() {
+      if (!requireAdmin()) return;
       const activity = selectedActivity();
       if (!activity) return toast("请先新建或选择一个活动。");
       const names = els.rosterNameInput.value
@@ -1828,7 +2082,8 @@
     function exportRoster() {
       const activity = selectedActivity();
       if (!activity) return toast("请先选择一个活动。");
-      const roster = activity.roster || [];
+      const allowedClientIds = new Set(scopedClients().map((client) => client.id));
+      const roster = isAdmin() ? (activity.roster || []) : (activity.roster || []).filter((row) => row.clientId && allowedClientIds.has(row.clientId));
       if (!roster.length) return toast("当前活动还没有报名名单。");
       const rows = roster.map((row, index) => {
         const client = state.clients.find((item) => item.id === row.clientId);
@@ -1936,11 +2191,22 @@
     }
 
     function openUserModal() {
-      openModal("新增使用者", `
+      if (!requireAdmin()) return;
+      openModal("新增推荐人账号", `
         <form>
-          <div class="form-field full">
-            <label>使用者姓名</label>
+          <div class="form-grid">
+          <div class="form-field">
+            <label>推荐人姓名</label>
             <input class="input" name="name" required placeholder="例如：林老师" />
+          </div>
+          <div class="form-field">
+            <label>登录账号</label>
+            <input class="input" name="username" required placeholder="例如：linlaoshi" />
+          </div>
+          <div class="form-field full">
+            <label>初始密码</label>
+            <input class="input" name="password" required placeholder="建议至少 6 位" />
+          </div>
           </div>
           <div class="modal-actions">
             <button class="btn ghost" type="button" onclick="document.getElementById('closeModalBtn').click()">取消</button>
@@ -1949,17 +2215,21 @@
         </form>
       `, (data) => {
         const name = data.get("name").trim();
-        if (!name) return;
-        const user = { id: uid("u"), name };
+        const username = data.get("username").trim();
+        const password = data.get("password").trim();
+        if (!name || !username || !password) return toast("请填写完整的推荐人账号信息。");
+        if (state.users.some((user) => user.username === username)) return toast("这个登录账号已经存在。");
+        const user = { id: uid("u"), name, username, password, role: "advisor" };
         state.users.push(user);
         state.currentUserId = user.id;
         closeModal();
-        toast("已新增使用者。");
+        toast("已新增推荐人账号。");
         saveAndRender();
       });
     }
 
     function openClientModal(clientId) {
+      if (!requireAdmin()) return;
       const client = state.clients.find((item) => item.id === clientId);
       const user = currentUser();
       openModal(client ? "编辑客户档案" : "新增客户档案", `
@@ -2022,6 +2292,7 @@
     }
 
     function openFollowModal() {
+      if (!requireAdmin()) return;
       const client = selectedClient();
       if (!client) return toast("请先选择一位客户。");
       openModal("记录一次陪伴", `
@@ -2058,6 +2329,7 @@
     }
 
     function openActivityModal() {
+      if (!requireAdmin()) return;
       const clients = visibleClients();
       if (!clients.length) return toast("请先新增客户。");
       const options = clients.map((client) => `
@@ -2147,6 +2419,7 @@
     }
 
     function deleteClient(clientId) {
+      if (!requireAdmin()) return;
       const client = state.clients.find((item) => item.id === clientId);
       if (!client) return;
       if (!confirm(`确认删除「${client.name}」的档案和相关陪伴记录吗？`)) return;
@@ -2162,6 +2435,7 @@
     }
 
     function exportBackup() {
+      if (!requireAdmin()) return;
       const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -2175,12 +2449,14 @@
     }
 
     function createShareView() {
+      const clients = visibleClients();
+      const clientIds = new Set(clients.map((client) => client.id));
       const shareState = {
         exportedAt: new Date().toISOString(),
-        users: state.users,
-        clients: state.clients,
-        activities: state.activities,
-        followUps: state.followUps
+        users: isAdmin() ? state.users : [currentLogin()].filter(Boolean),
+        clients,
+        activities: state.activities.filter((activity) => activity.participantClientIds.some((id) => clientIds.has(id))),
+        followUps: state.followUps.filter((follow) => clientIds.has(follow.clientId))
       };
       const encoded = encodeShareData(shareState);
       const base = new URL("share.html", window.location.href);
@@ -2210,6 +2486,7 @@
     }
 
     function openShareBaseModal() {
+      if (!requireAdmin()) return;
       const current = getSharePublicBaseUrl();
       openModal("设置线上共享地址", `
         <form>
@@ -2259,6 +2536,10 @@
     }
 
     function importBackup(event) {
+      if (!requireAdmin()) {
+        event.target.value = "";
+        return;
+      }
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
@@ -2268,7 +2549,7 @@
           if (!Array.isArray(parsed.clients) || !Array.isArray(parsed.users)) {
             throw new Error("Invalid backup");
           }
-          state = { ...structuredClone(seedState), ...parsed };
+          state = normalizeState({ ...structuredClone(seedState), ...parsed, currentLoginId: state.currentLoginId });
           ensureValidSelection();
           saveAndRender();
           toast("备份已导入。");
@@ -2282,8 +2563,9 @@
     }
 
     function resetSeed() {
+      if (!requireAdmin()) return;
       if (!confirm("确认恢复示例数据？当前本地数据会被覆盖。")) return;
-      state = structuredClone(seedState);
+      state = normalizeState({ ...structuredClone(seedState), currentLoginId: "admin" });
       saveAndRender();
       toast("已恢复示例数据。");
     }
